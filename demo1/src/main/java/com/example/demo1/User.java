@@ -5,7 +5,8 @@ public class User {
     private String username; // 用户名
     private String password; // 密码
     private String role; // 用户角色：salesperson, sales_admin, warehouse_admin
-
+    private int salespersonId; // 如果角色是销售人员，存储其关联的销售员 ID
+    private boolean isActive; // 标记用户是否有效
     // 构造函数
     public User(String username, String password, String role) {
         if (username == null || username.isEmpty()) {
@@ -21,7 +22,11 @@ public class User {
         this.password = password;
         this.role = role;
     }
+    public int getSalespersonId() { return salespersonId; }
+    public void setSalespersonId(int salespersonId) { this.salespersonId = salespersonId; }
 
+    public boolean isActive() { return isActive; }
+    public void setActive(boolean active) { isActive = active; }
     // 无参构造函数（用于 DAO 层操作）
     public User() {}
 

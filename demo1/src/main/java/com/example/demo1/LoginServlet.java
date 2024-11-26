@@ -21,57 +21,73 @@ public class LoginServlet extends HttpServlet {
     @Override
     public void init() {
         try {
-            // 使用连接池获取数据库连接
+            // 初始化 UserDAO
             Connection connection = DatabaseConnectionManager.getConnection();
             userDAO = new UserDAO(connection);
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to initialize database connection in LoginServlet", e);
+            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize LoginServlet due to database connection issues.", e);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // 获取登录表单的参数
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html;charset=UTF-8");
+
+        // 获取表单参数
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         String role = req.getParameter("role");
 
         try {
-            // 验证用户信息
+            // 验证用户登录信息
             User user = userDAO.validateUser(username, password, role);
-            if (user != null) {
-                // 将用户信息保存到 session 中
-                HttpSession session = req.getSession();
-                session.setAttribute("user", user);
 
-                // 根据角色跳转到不同的页面
-                switch (role) {
-                    case "salesperson":
-                        resp.sendRedirect("salesperson_dashboard.jsp");
-                        break;
-                    case "sales_admin":
-                        resp.sendRedirect("sales_admin_dashboard.jsp");
-                        break;
-                    case "warehouse_admin":
-                        resp.sendRedirect("warehouse_admin_dashboard.jsp");
-                        break;
-                    default:
-                        // 如果角色不匹配，跳转到错误页面
-                        resp.sendError(HttpServletResponse.SC_FORBIDDEN, "无效的角色！");
+            if (user != null) {
+                // 检查是否为有效用户
+                if (user.isActive()) {
+                    // 登录成功，将用户信息存入 session
+                    HttpSession session = req.getSession();
+                    session.invalidate(); // 防止固定会话攻击
+                    session = req.getSession(true);
+                    session.setAttribute("user", user);
+
+                    // 根据角色跳转到不同的页面
+                    switch (role) {
+                        case "销售人员":
+                            req.getRequestDispatcher("salesperson_dashboard.jsp").forward(req, resp);
+                            break;
+                        case "销售管理员":
+                            req.getRequestDispatcher("sales_admin_dashboard.jsp").forward(req, resp);
+                            break;
+                        case "仓库管理员":
+                            req.getRequestDispatcher("warehouse_admin_dashboard.jsp").forward(req, resp);
+                            break;
+                        default:
+                            req.setAttribute("errorMsg", "无效的角色！");
+                            req.getRequestDispatcher("login.jsp").forward(req, resp);
+                    }
+                } else {
+                    // 用户被禁用
+                    req.setAttribute("errorMsg", "账号已被禁用，请联系管理员！");
+                    req.getRequestDispatcher("login.jsp").forward(req, resp);
                 }
             } else {
-                // 登录失败处理
-                resp.getWriter().println("<html><body><h3>登录失败：用户名或密码错误</h3></body></html>");
+                // 登录失败
+                req.setAttribute("errorMsg", "用户名或密码错误！");
+                req.getRequestDispatcher("login.jsp").forward(req, resp);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "系统错误，请稍后再试！");
+            req.setAttribute("errorMsg", "系统错误，请稍后再试！");
+            req.getRequestDispatcher("login.jsp").forward(req, resp);
         }
     }
 
     @Override
     public void destroy() {
-        // 如果需要，可以在销毁时关闭连接资源
         super.destroy();
     }
 }
