@@ -24,7 +24,7 @@ public class ContractDAO {
             // 获取生成的合同ID
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    return rs.getInt(1); // 返回合同ID
                 }
             }
         } catch (SQLException e) {

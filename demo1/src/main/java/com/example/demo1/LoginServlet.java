@@ -31,7 +31,7 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
@@ -42,19 +42,19 @@ public class LoginServlet extends HttpServlet {
         String role = req.getParameter("role");
 
         try {
-            // 验证用户登录信息
+            // 验证用户
             User user = userDAO.validateUser(username, password, role);
 
             if (user != null) {
-                // 检查是否为有效用户
+                // 检查用户是否为有效用户
                 if (user.isActive()) {
-                    // 登录成功，将用户信息存入 session
+                    // 登录成功，保存用户信息到 session
                     HttpSession session = req.getSession();
                     session.invalidate(); // 防止固定会话攻击
                     session = req.getSession(true);
                     session.setAttribute("user", user);
 
-                    // 根据角色跳转到不同的页面
+                    // 根据角色跳转页面
                     switch (role) {
                         case "销售人员":
                             req.getRequestDispatcher("salesperson_dashboard.jsp").forward(req, resp);
@@ -70,12 +70,12 @@ public class LoginServlet extends HttpServlet {
                             req.getRequestDispatcher("login.jsp").forward(req, resp);
                     }
                 } else {
-                    // 用户被禁用
+                    // 用户已被禁用
                     req.setAttribute("errorMsg", "账号已被禁用，请联系管理员！");
                     req.getRequestDispatcher("login.jsp").forward(req, resp);
                 }
             } else {
-                // 登录失败
+                // 用户名或密码错误
                 req.setAttribute("errorMsg", "用户名或密码错误！");
                 req.getRequestDispatcher("login.jsp").forward(req, resp);
             }

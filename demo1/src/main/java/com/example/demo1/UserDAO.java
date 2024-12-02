@@ -14,19 +14,21 @@ public class UserDAO {
 
     // 验证用户登录信息
     public User validateUser(String username, String password, String role) throws SQLException {
-        // 使用 [User] 确保表名与 SQL Server 保留关键字冲突时能正常运行
-        String sql = "SELECT * FROM [User] WHERE username = ? AND password = ? AND role = ?";
+        String sql = "SELECT * FROM [User] WHERE username = ? AND password = ? AND role = ? AND is_active = 1";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, password); // 如果密码加密，请在这里对 password 加密后再设置
             ps.setString(3, role);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapResultSetToUser(rs);
+                    User user = mapResultSetToUser(rs);
+                    System.out.println("User authenticated: " + user); // 打印调试信息
+                    return user;
                 }
             }
         }
+        System.out.println("User not found or inactive: username=" + username + ", role=" + role);
         return null; // 用户验证失败
     }
 
@@ -84,7 +86,13 @@ public class UserDAO {
         user.setUsername(rs.getString("username"));
         user.setPassword(rs.getString("password"));
         user.setRole(rs.getString("role"));
-        user.setSalespersonId(rs.getInt("salesperson_id"));
+
+        // 处理可选字段
+        int salespersonId = rs.getInt("salesperson_id");
+        if (!rs.wasNull()) {
+            user.setSalespersonId(salespersonId);
+        }
+
         user.setActive(rs.getBoolean("is_active"));
         return user;
     }

@@ -7,27 +7,14 @@ public class User {
     private String role; // 用户角色：salesperson, sales_admin, warehouse_admin
     private int salespersonId; // 如果角色是销售人员，存储其关联的销售员 ID
     private boolean isActive; // 标记用户是否有效
-    // 构造函数
+
+    // 灵活的构造函数（允许部分字段）
     public User(String username, String password, String role) {
-        if (username == null || username.isEmpty()) {
-            throw new IllegalArgumentException("用户名不能为空");
-        }
-        if (password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("密码不能为空");
-        }
-        if (role == null || role.isEmpty()) {
-            throw new IllegalArgumentException("角色不能为空");
-        }
         this.username = username;
         this.password = password;
         this.role = role;
     }
-    public int getSalespersonId() { return salespersonId; }
-    public void setSalespersonId(int salespersonId) { this.salespersonId = salespersonId; }
 
-    public boolean isActive() { return isActive; }
-    public void setActive(boolean active) { isActive = active; }
-    // 无参构造函数（用于 DAO 层操作）
     public User() {}
 
     // Getters 和 Setters
@@ -72,12 +59,29 @@ public class User {
         this.role = role;
     }
 
+    public int getSalespersonId() {
+        return salespersonId;
+    }
+
+    public void setSalespersonId(int salespersonId) {
+        this.salespersonId = salespersonId;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", role='" + role + '\'' +
+                ", isActive=" + isActive +
                 '}';
     }
 }

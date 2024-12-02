@@ -14,6 +14,8 @@ public class DatabaseConnectionManager {
         config.setJdbcUrl("jdbc:sqlserver://localhost:1433;databaseName=sy;encrypt=false");
         config.setUsername("sa");
         config.setPassword("xiaoxiao1683");
+        config.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
         config.setMaximumPoolSize(10);
         dataSource = new HikariDataSource(config);
     }

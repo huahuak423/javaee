@@ -1,5 +1,7 @@
 package com.example.demo1.sales;
 
+import com.example.demo1.Product;
+import com.example.demo1.ProductDAO;
 import com.example.demo1.contract.Contract;
 import com.example.demo1.contract.ContractDAO;
 import com.example.demo1.contract.ContractItem;
@@ -11,10 +13,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/AddContractServlet")
 public class AddContractServlet extends HttpServlet {
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ProductDAO productDAO = new ProductDAO();
+        List<Product> products = productDAO.getAllProducts(); // 获取所有商品信息
+        if (products == null || products.isEmpty()) {
+            System.out.println("No products found in database."); // 添加调试日志
+        }
+        request.setAttribute("products", products); // 设置商品信息到请求中
+        request.getRequestDispatcher("add_contract.jsp").forward(request, response); // 转发到JSP页面
+    }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 获取合同基本信息
         int customerId = Integer.parseInt(request.getParameter("customer_id"));
@@ -23,20 +35,19 @@ public class AddContractServlet extends HttpServlet {
         String[] quantities = request.getParameterValues("quantity[]");
         String[] unitPrices = request.getParameterValues("unit_price[]");
 
-        // 验证输入
-        if (productIds == null || quantities == null || unitPrices == null || productIds.length == 0) {
+        if (productIds == null || quantities == null || unitPrices == null) {
             request.setAttribute("error", "商品信息不能为空！");
             request.getRequestDispatcher("add_contract.jsp").forward(request, response);
             return;
         }
 
         try {
-            // 创建合同对象并保存到数据库
+            // 保存合同基本信息
             Contract contract = new Contract(customerId, salespersonId);
             ContractDAO contractDAO = new ContractDAO();
             int contractId = contractDAO.saveContract(contract);
 
-            // 保存合同商品信息
+            // 保存商品明细
             ContractItemDAO contractItemDAO = new ContractItemDAO();
             for (int i = 0; i < productIds.length; i++) {
                 int productId = Integer.parseInt(productIds[i]);
@@ -47,7 +58,6 @@ public class AddContractServlet extends HttpServlet {
                 contractItemDAO.saveContractItem(item);
             }
 
-            // 重定向到成功页面
             response.sendRedirect("success.jsp");
         } catch (Exception e) {
             e.printStackTrace();
