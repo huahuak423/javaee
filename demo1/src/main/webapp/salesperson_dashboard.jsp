@@ -23,7 +23,7 @@
 <h2>欢迎, <%= user.getUsername() %>!</h2>
 <h2>功能选择</h2>
 <a href="AddContractServlet">新增合同</a> |
-<a href="search_contract.jsp">查询合同</a> |
-<a href="pl_turnover.jsp">查看个人销售额</a>
+<a href="ViewContractsServlet">查询合同</a> |
+<a href="ViewSalesPerformanceServlet">查看个人销售额</a>
 </body>
 </html>

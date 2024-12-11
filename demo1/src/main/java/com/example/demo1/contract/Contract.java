@@ -1,5 +1,8 @@
 package com.example.demo1.contract;
 
+
+import java.util.Date;
+
 public class Contract {
     private int contractId;
     private int customerId;
@@ -7,15 +10,19 @@ public class Contract {
     private String customerName; // 客户名称
     private double totalAmount;  // 总金额
     private String status;       // 合同状态
-    private String createDate;   // 创建日期
-
+    private Date createDate; // 创建日期
+    private Date endDate; // 结束日期
+    private String remarks; // 备注
     public Contract() {
         // 默认构造器
     }
 
-    public Contract(int customerId, int salespersonId) {
+    public Contract(int customerId, int salespersonId,String status,double totalAmount) {
         this.customerId = customerId;
         this.salespersonId = salespersonId;
+        this.status = status;
+        this.totalAmount = totalAmount;
+        this.createDate = new Date(); // 设置当前时间
     }
 
     // Getter 和 Setter 方法
@@ -66,12 +73,15 @@ public class Contract {
     public void setStatus(String status) {
         this.status = status;
     }
-
-    public String getCreateDate() {
+    // 适合计算销售业绩的方法
+    public double calculatePerformance(double commissionRate) {
+        return this.totalAmount * commissionRate; // 销售业绩
+    }
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 }

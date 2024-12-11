@@ -6,6 +6,8 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
+<% response.setCharacterEncoding("UTF-8"); %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,5 +33,10 @@
         </tr>
     </c:forEach>
 </table>
+
+<c:if test="${empty contracts}">
+    <p>没有找到合同记录。</p>
+</c:if>
+
 </body>
 </html>

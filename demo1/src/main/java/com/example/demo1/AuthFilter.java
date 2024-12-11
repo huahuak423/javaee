@@ -37,7 +37,7 @@ public class AuthFilter implements Filter {
 
             // 定义不同角色可访问的页面路径
             Map<String, List<String>> rolePages = new HashMap<>();
-            rolePages.put("销售人员", Arrays.asList("add_contract.jsp", "contract.jsp", "customer.jsp", "pl_turnover.jsp", "salesperson_dashboard.jsp", "search_contract.jsp","AddContractServlet"));
+            rolePages.put("销售人员", Arrays.asList("add_contract.jsp","ViewContractsServlet", "contract.jsp", "customer.jsp", "pl_turnover.jsp", "salesperson_dashboard.jsp", "search_contract.jsp","AddContractServlet","SuccessServlet"));
             rolePages.put("销售管理员", Arrays.asList("sales_admin_dashboard.jsp", "customer_manage.jsp", "salesperson_manage.jsp"));
             rolePages.put("仓库管理员", Arrays.asList("warehouse_admin_dashboard.jsp", "delivery_note.jsp", "stock_view.jsp"));
 

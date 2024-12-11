@@ -1,7 +1,6 @@
 package com.example.demo1.sales;
 
-import com.example.demo1.Product;
-import com.example.demo1.ProductDAO;
+import com.example.demo1.*;
 import com.example.demo1.contract.Contract;
 import com.example.demo1.contract.ContractDAO;
 import com.example.demo1.contract.ContractItem;
@@ -13,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/AddContractServlet")
@@ -20,10 +20,24 @@ public class AddContractServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ProductDAO productDAO = new ProductDAO();
-        List<Product> products = productDAO.getAllProducts(); // 获取所有商品信息
+        List<Product> products = productDAO.getAllProducts();
         if (products == null || products.isEmpty()) {
-            System.out.println("No products found in database."); // 添加调试日志
+            System.out.println("No products found in database.");
         }
+        CustomerDAO customerDAO = new CustomerDAO();
+        List<Customer> customers = customerDAO.getAllCustomers();
+
+        // 使用 SalespersonDAO 获取销售人员
+        SalespersonDAO salespersonDAO = null;
+        try {
+            salespersonDAO = new SalespersonDAO(DatabaseConnectionManager.getConnection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        List<Salesperson> salespersons = salespersonDAO.getAllSalespersons();
+        request.setAttribute("salespersons", salespersons);
+
+        request.setAttribute("customers", customers);
         request.setAttribute("products", products); // 设置商品信息到请求中
         request.getRequestDispatcher("add_contract.jsp").forward(request, response); // 转发到JSP页面
     }
@@ -34,20 +48,21 @@ public class AddContractServlet extends HttpServlet {
         String[] productIds = request.getParameterValues("product_id[]");
         String[] quantities = request.getParameterValues("quantity[]");
         String[] unitPrices = request.getParameterValues("unit_price[]");
+        System.out.println("Customer ID: " + customerId);
+        System.out.println("Salesperson ID: " + salespersonId);
 
         if (productIds == null || quantities == null || unitPrices == null) {
             request.setAttribute("error", "商品信息不能为空！");
-            request.getRequestDispatcher("add_contract.jsp").forward(request, response);
+            request.getRequestDispatcher("AddContractServlet").forward(request, response);
             return;
         }
 
         try {
-            // 保存合同基本信息
-            Contract contract = new Contract(customerId, salespersonId);
+            Contract contract = new Contract(customerId, salespersonId, "未履行", 0); // 初始总金额为0
             ContractDAO contractDAO = new ContractDAO();
-            int contractId = contractDAO.saveContract(contract);
+            int contractId = contractDAO.saveContract(contract); // 保存合同并获取合同ID
 
-            // 保存商品明细
+            double totalAmount = 0.0;
             ContractItemDAO contractItemDAO = new ContractItemDAO();
             for (int i = 0; i < productIds.length; i++) {
                 int productId = Integer.parseInt(productIds[i]);
@@ -56,9 +71,16 @@ public class AddContractServlet extends HttpServlet {
 
                 ContractItem item = new ContractItem(contractId, productId, quantity, unitPrice);
                 contractItemDAO.saveContractItem(item);
+
+                totalAmount += quantity * unitPrice; // 计算总金额
             }
 
-            response.sendRedirect("success.jsp");
+            // 更新合同总金额
+            contract.setTotalAmount(totalAmount);
+            contract.setContractId(contractId);
+            contractDAO.updateContractTotalAmount(contract); // 更新数据库中的总金额
+
+            response.sendRedirect("SuccessServlet");
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "创建合同失败，请重试！");

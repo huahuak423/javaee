@@ -24,8 +24,10 @@ public class CustomerDAO {
                 return customer;
             }
         } catch (SQLException e) {
+            System.err.println("Error occurred while saving contract: " + e.getMessage());
             e.printStackTrace();
         }
+
         return null;
     }
     public boolean addCustomer(Customer customer) {
@@ -44,7 +46,7 @@ public class CustomerDAO {
     }
     public List<Customer> getAllCustomers() {
         List<Customer> customers = new ArrayList<>();
-        String sql = "SELECT * FROM Customer";
+        String sql = "SELECT * FROM [Customer]";
         try (Connection conn = DatabaseConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -58,8 +60,10 @@ public class CustomerDAO {
                 customers.add(customer);
             }
         } catch (SQLException e) {
+            System.err.println("Error occurred while saving contract: " + e.getMessage());
             e.printStackTrace();
         }
+
         return customers;
     }
 

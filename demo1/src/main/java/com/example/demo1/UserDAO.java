@@ -42,6 +42,19 @@ public class UserDAO {
             return ps.executeUpdate() > 0; // 返回插入是否成功
         }
     }
+    // 在 UserDAO 中添加方法
+    public List<User> getAllSalespersons() throws SQLException {
+        List<User> salespersons = new ArrayList<>();
+        String sql = "SELECT * FROM [User] WHERE role = '销售人员' AND is_active = 1";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                salespersons.add(mapResultSetToUser(rs));
+            }
+        }
+        return salespersons;
+    }
 
     // 查询所有用户
     public List<User> getAllUsers() throws SQLException {

@@ -14,32 +14,31 @@
 <head>
   <title>新增合同</title>
   <script>
-    const productOptions = `
-    <c:forEach var="product" items="${products}">
-      <option value="${product.productId}" data-price="${product.price}">${product.name}</option>
-    </c:forEach>
-  `;
-
     function addProductRow() {
       const table = document.getElementById("product_table");
       const row = table.insertRow();
       row.innerHTML = `
-      <td>
-        <select name="product_id[]" required onchange="updatePrice(this)">
-          ${productOptions}
-        </select>
-      </td>
-      <td><input type="number" name="quantity[]" min="1" required></td>
-      <td><input type="number" name="unit_price[]" step="0.01" min="0" readonly></td>
-      <td><button type="button" onclick="deleteRow(this)">删除</button></td>
+        <td>
+            <select name="product_id[]" required onchange="updateUnitPrice(this)">
+                <c:forEach var="product" items="${products}">
+                    <option value="${product.productId}" data-price="${product.price}">${product.name} - ${product.price}</option>
+                </c:forEach>
+            </select>
+        </td>
+        <td><input type="number" name="quantity[]" min="1" required></td>
+        <td><input type="number" name="unit_price[]" step="0.01" min="2000" value="0" required></td>
+        <td><button type="button" onclick="deleteRow(this)">删除</button></td>
     `;
     }
 
-    function updatePrice(selectElement) {
-      const selectedOption = selectElement.options[selectElement.selectedIndex];
-      const price = selectedOption.getAttribute("data-price");
-      const priceInput = selectElement.parentElement.nextElementSibling.nextElementSibling.firstElementChild;
-      priceInput.value = price;
+    function updateUnitPrice(select) {
+      const selectedOption = select.options[select.selectedIndex];
+      const unitPriceInput = select.closest('tr').querySelector('input[name="unit_price[]"]');
+      const minPrice = selectedOption.getAttribute('data-price'); // 获取当前商品的价格
+
+      // 更新单价输入框的最小值和默认值
+      unitPriceInput.min = minPrice;
+      unitPriceInput.value = minPrice; // 可选：将单价的初始值设为商品的价格
     }
   </script>
 </head>
@@ -49,14 +48,14 @@
   <label>客户:</label>
   <select name="customer_id" required>
     <c:forEach var="customer" items="${customers}">
-      <option value="${customer.id}">${customer.name}</option>
+      <option value="${customer.customerId}">${customer.name}</option>
     </c:forEach>
   </select><br>
 
   <label>销售人员:</label>
   <select name="salesperson_id" required>
     <c:forEach var="salesperson" items="${salespersons}">
-      <option value="${salesperson.id}">${salesperson.name}</option>
+      <option value="${salesperson.id}">${salesperson.username}</option>
     </c:forEach>
   </select><br>
 

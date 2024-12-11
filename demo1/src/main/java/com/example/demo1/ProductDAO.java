@@ -30,8 +30,10 @@ public class ProductDAO {
                 productList.add(new Product(id, name, price, stock, threshold, category));
             }
         } catch (SQLException e) {
+            System.err.println("Error occurred while saving contract: " + e.getMessage());
             e.printStackTrace();
         }
+
 
         return productList;
     }
@@ -49,8 +51,10 @@ public class ProductDAO {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
+            System.err.println("Error occurred while saving contract: " + e.getMessage());
             e.printStackTrace();
         }
+
         return false;
     }
 
@@ -68,8 +72,10 @@ public class ProductDAO {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
+            System.err.println("Error occurred while saving contract: " + e.getMessage());
             e.printStackTrace();
         }
+
         return false;
     }
 
@@ -81,8 +87,10 @@ public class ProductDAO {
             preparedStatement.setInt(1, productId);
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
+            System.err.println("Error occurred while saving contract: " + e.getMessage());
             e.printStackTrace();
         }
+
         return false;
     }
 }
