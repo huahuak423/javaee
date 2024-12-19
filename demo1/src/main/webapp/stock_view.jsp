@@ -6,29 +6,36 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>库存查询</title>
+    <title>商品库存</title>
 </head>
 <body>
-<h2>商品库存查询</h2>
+<h2>商品库存信息</h2>
+
 <table border="1">
     <tr>
-        <th>商品编号</th>
-        <th>商品名称</th>
-        <th>库存量</th>
-        <th>阈值</th>
+        <th>商品ID</th>
+        <th>名称</th>
+        <th>单价</th>
+        <th>库存</th>
+        <th>库存阈值</th>
+        <th>类别</th>
     </tr>
-    <!-- 使用 JSTL 或脚本动态填充商品库存信息 -->
-    <c:forEach var="product" items="${products}">
+    <c:forEach var="product" items="${productList}">
         <tr>
-            <td>${product.product_id}</td>
+            <td>${product.productId}</td>
             <td>${product.name}</td>
+            <td>${product.price}</td>
             <td>${product.stock}</td>
             <td>${product.threshold}</td>
+            <td>${product.category}</td>
         </tr>
     </c:forEach>
 </table>
+
+<a href="warehouse_admin_dashboard.jsp">返回仓库管理主页</a>
 </body>
 </html>

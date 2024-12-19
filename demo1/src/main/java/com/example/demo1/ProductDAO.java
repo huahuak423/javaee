@@ -8,7 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDAO {
-
+    // 更新商品库存
+    public boolean updateStock(int productId, int quantity) {
+        String sql = "UPDATE Product SET stock = stock + ? WHERE product_id = ?";
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, quantity);
+            preparedStatement.setInt(2, productId);
+            return preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     // 获取所有商品信息
     public List<Product> getAllProducts() {
         List<Product> productList = new ArrayList<>();

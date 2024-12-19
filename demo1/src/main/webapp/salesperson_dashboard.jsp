@@ -25,5 +25,6 @@
 <a href="AddContractServlet">新增合同</a> |
 <a href="ViewContractsServlet">查询合同</a> |
 <a href="ViewSalesPerformanceServlet">查看个人销售额</a>
+<a href="LoginServlet">注销</a>
 </body>
 </html>

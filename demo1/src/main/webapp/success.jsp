@@ -12,24 +12,48 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>合同签订成功</title>
+  <title>成功</title>
   <script>
     function redirectToHomePage() {
       setTimeout(function() {
-        // 定义返回的初始页面 URL，您需要替换为实际的初始页面路径
-        window.location.href = "salesperson_dashboard.jsp"; // 或者其他初始页面
+        // 返回的初始页面 URL
+        var userRole = '${userRole}'; // 获取实际的用户角色
+
+        // 根据角色返回不同的主页
+        if (userRole === '销售人员') {
+          window.location.href = "salesperson_dashboard.jsp";
+        } else if (userRole === '销售管理员') {
+          window.location.href = "sales_admin_dashboard.jsp";
+        } else if (userRole === '仓库管理员') {
+          window.location.href = "warehouse_admin_dashboard.jsp";
+        } else {
+          window.location.href = "LoginServlet"; // 一般用户或其他角色的默认主页
+        }
       }, 3000); // 3000 毫秒后跳转
     }
   </script>
 </head>
 <body onload="redirectToHomePage()">
-<h2>合同签订成功！</h2>
-<p>当前销售人员合同已成功签订。</p>
+<h2>当前操作成功！</h2>
+<c:choose>
+  <c:when test="${userRole == '销售人员'}">
+    <p>当前销售人员合同已成功签订。</p>
+  </c:when>
+  <c:when test="${userRole == '销售管理员'}">
+    <p>当前销售管理员的操作已成功。</p>
+  </c:when>
+  <c:when test="${userRole == '仓库管理员'}">
+    <p>当前仓库管理员的操作已成功。</p>
+  </c:when>
+  <c:otherwise>
+    <p>当前操作成功。</p>
+  </c:otherwise>
+</c:choose>
 <p>您将于 3 秒后返回初始页面。</p>
 
 <script>
   // 弹窗提示用户合同成功签订
-  alert("合同签订成功，您将于 3 秒后返回初始页面。");
+  alert("当前操作成功，您将于 3 秒后返回初始页面。");
 </script>
 </body>
 </html>

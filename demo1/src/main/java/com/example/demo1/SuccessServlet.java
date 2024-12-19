@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -12,8 +13,17 @@ import java.io.IOException;
 public class SuccessServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 例如，您可能从请求中获取销售人员的名字或其他信息
-        // String salespersonName = request.getParameter("salesperson_name");
+        HttpSession session = request.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        String userRole = null;
+        if (user != null) {
+            userRole = user.getRole();  // 假设 User 类中有 getRole() 方法
+        }
+
+        // 将用户角色设置到请求中，以便在 JSP 中使用
+        request.setAttribute("userRole", userRole);
+
         try {
             request.getRequestDispatcher("success.jsp").forward(request, response);
         } catch (IOException e) {
@@ -23,7 +33,6 @@ public class SuccessServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 同样处理 POST 请求（如果需要）
-        doGet(request, response);
+        doGet(request, response); // POST 请求同样处理
     }
 }

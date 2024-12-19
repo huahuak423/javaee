@@ -1,4 +1,4 @@
-package com.example.demo1.sales;
+package com.example.demo1.salesmanger;
 
 import com.example.demo1.Customer;
 import com.example.demo1.CustomerDAO;
@@ -9,9 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/CustomerManagementServlet")

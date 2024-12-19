@@ -37,9 +37,9 @@ public class AuthFilter implements Filter {
 
             // 定义不同角色可访问的页面路径
             Map<String, List<String>> rolePages = new HashMap<>();
-            rolePages.put("销售人员", Arrays.asList("add_contract.jsp","ViewContractsServlet", "contract.jsp", "customer.jsp", "pl_turnover.jsp", "salesperson_dashboard.jsp", "search_contract.jsp","AddContractServlet","SuccessServlet"));
-            rolePages.put("销售管理员", Arrays.asList("sales_admin_dashboard.jsp", "customer_manage.jsp", "salesperson_manage.jsp"));
-            rolePages.put("仓库管理员", Arrays.asList("warehouse_admin_dashboard.jsp", "delivery_note.jsp", "stock_view.jsp"));
+            rolePages.put("销售人员", Arrays.asList("SuccessServlet","LoginServlet","LogoutServlet","ViewSalesPerformanceServlet","LoginServlet","add_contract.jsp","ViewContractsServlet", "contract.jsp", "customer.jsp", "pl_turnover.jsp", "salesperson_dashboard.jsp", "search_contract.jsp","AddContractServlet","SuccessServlet"));
+            rolePages.put("销售管理员", Arrays.asList("LoginServlet","SuccessServlet","LogoutServlet","ModifyContractServlet","CustomerManagementServlet","sales_admin_dashboard.jsp", "customer_manage.jsp", "salesperson_manage.jsp"));
+            rolePages.put("仓库管理员", Arrays.asList("LoginServlet","LogoutServlet","SuccessServlet","ConfirmPurchaseOrderServlet","LoginServlet","GeneratePurchaseOrderServlet","ViewInventoryServlet","ConfirmInventoryUpdateServlet","warehouse_admin_dashboard.jsp", "delivery_note.jsp", "stock_view.jsp"));
 
             // 检查当前用户角色是否允许访问请求页面
             boolean isAllowed = rolePages.getOrDefault(role, Collections.emptyList()).stream()
@@ -48,6 +48,17 @@ public class AuthFilter implements Filter {
             if (!isAllowed) {
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "您没有权限访问该页面！");
                 return;
+            }
+            // 检查未履行进货单逻辑
+            if (role.equals("仓库管理员") && uri.endsWith("GeneratePurchaseOrderServlet")) {
+                PurchaseOrderDAO purchaseOrderDAO = new PurchaseOrderDAO();
+                boolean hasPendingOrders = !purchaseOrderDAO.getPendingOrders().isEmpty();
+
+                if (hasPendingOrders) {
+                    httpResponse.setContentType("text/html; charset=UTF-8");
+                    httpResponse.getWriter().println("<script>alert('当前还有未履行的进货单，请先完成进货！'); window.location.href='warehouse_admin_dashboard.jsp';</script>");
+                    return;
+                }
             }
         }
 

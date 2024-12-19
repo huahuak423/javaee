@@ -31,6 +31,17 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 禁止缓存
+        resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        resp.setHeader("Pragma", "no-cache");
+        resp.setDateHeader("Expires", 0);
+
+        // 转发到登录页面
+        req.getRequestDispatcher("login.jsp").forward(req, resp);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
@@ -46,7 +57,6 @@ public class LoginServlet extends HttpServlet {
             User user = userDAO.validateUser(username, password, role);
 
             if (user != null) {
-                // 检查用户是否为有效用户
                 if (user.isActive()) {
                     // 登录成功，保存用户信息到 session
                     HttpSession session = req.getSession();
@@ -70,12 +80,10 @@ public class LoginServlet extends HttpServlet {
                             req.getRequestDispatcher("login.jsp").forward(req, resp);
                     }
                 } else {
-                    // 用户已被禁用
                     req.setAttribute("errorMsg", "账号已被禁用，请联系管理员！");
                     req.getRequestDispatcher("login.jsp").forward(req, resp);
                 }
             } else {
-                // 用户名或密码错误
                 req.setAttribute("errorMsg", "用户名或密码错误！");
                 req.getRequestDispatcher("login.jsp").forward(req, resp);
             }
@@ -88,6 +96,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void destroy() {
-        super.destroy();
+        super.destroy(); // 确保父类逻辑被执行
+        // 释放其他资源
     }
 }
